@@ -7,7 +7,7 @@ import java.util.LinkedList;
 /**
  * Created by Николай on 27.03.2017.
  */
-public class TaskA {
+public class TaskB {
 
     public enum Color { WHITE, GREY, BLACK }
 
@@ -22,7 +22,7 @@ public class TaskA {
         ArrayList<LinkedList<Integer>> adj;
 
         boolean isCycled;
-        int verLeft;
+        int cycleStart;
 
         public Graph(int ver, int rib) {
             this.ver = ver;
@@ -44,22 +44,26 @@ public class TaskA {
     }
 
 
-    private static void DFS (Graph graph, int[] list) {
+    private static LinkedList<Integer> DFS (Graph graph) {
         for (int i = 0; i < graph.ver; i++) {
             graph.color[i] = Color.WHITE;
             graph.parent[i] = -1;
         }
         int time = 0;
-        graph.verLeft = graph.ver;
+        LinkedList<Integer> cycle = new LinkedList();
         for (int i = 0; i < graph.ver; i++) {
-            if (graph.color[i] == Color.WHITE)
-                DFS_Visit(graph, i, time, list);
+            if (graph.color[i] == Color.WHITE) {
+                DFS_Visit(graph, i, time, cycle);
+                if (!cycle.isEmpty()) {
+                    return cycle;
+                }
+            }
         }
+        return cycle;
     }
 
 
-
-    private static void DFS_Visit(Graph graph, int i, int time, int[] list) {
+    private static void DFS_Visit(Graph graph, int i, int time, LinkedList<Integer> cycle) {
 
         if (graph.isCycled) {
             return;
@@ -68,40 +72,41 @@ public class TaskA {
         graph.color[i] = Color.GREY;
         time++;
         graph.open[i] = time;
+        cycle.add(i);
 
         for (Integer ver : graph.adj.get(i)) {
             if (graph.color[ver] == Color.WHITE) {
                 graph.parent[ver] = i;
-                DFS_Visit(graph, ver, time, list);
-            } else {
-                if (graph.color[ver] == Color.GREY) {
-                    graph.isCycled = true;
+                DFS_Visit(graph, ver, time, cycle);
+                if (graph.isCycled) {
                     return;
                 }
+            } else if (graph.color[ver] == Color.GREY) {
+                graph.parent[ver] = i;
+                graph.isCycled = true;
+                graph.cycleStart = ver;
+                return;
             }
         }
         graph.color[i] = Color.BLACK;
         graph.close[i] = time;
-        list[--graph.verLeft] = i;
+        cycle.removeLast();
     }
 
 
-    private static int[] Topological_Sort(Graph graph) {
-        int[] list = new int[graph.ver];
-        DFS(graph, list);
-        return list;
+    private static LinkedList<Integer> Topological_Sort(Graph graph) {
+        return DFS(graph);
     }
 
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/Lab2/topsort.in"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab2/topsort.out"));
+        BufferedReader in = new BufferedReader(new FileReader("src/Lab2/cycle.in"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab2/cycle.out"));
 
         String[] str = in.readLine().split("[ ]");
         int n = Integer.parseInt(str[0]);
         int m = Integer.parseInt(str[1]);
-
 
         Graph graph = new Graph(n, m);
 
@@ -113,14 +118,17 @@ public class TaskA {
             graph.addRib(a, b);
         }
 
-        int[] list = Topological_Sort(graph);
+        LinkedList<Integer> cycle = Topological_Sort(graph);
 
         if (graph.isCycled) {
-            out.write("-1");
-        } else {
-            for (int ver : list) {
+            out.write("YES\n");
+            while (cycle.getFirst() != graph.cycleStart)
+                cycle.removeFirst();
+            for (int ver : cycle) {
                 out.write(ver + 1 + " ");
             }
+        } else {
+            out.write("NO");
         }
 
         in.close();
