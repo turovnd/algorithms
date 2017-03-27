@@ -1,4 +1,4 @@
-package lab1;
+package Lab1;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -87,8 +87,8 @@ public class taskF {
      */
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/lab1/inputF.txt"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/lab1/outputF.txt"));
+        BufferedReader in = new BufferedReader(new FileReader("src/Lab1/inputF.txt"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab1/outputF.txt"));
 
         String[] str;
 

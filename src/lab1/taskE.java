@@ -1,4 +1,4 @@
-package lab1;
+package Lab1;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -64,8 +64,8 @@ public class taskE {
      */
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/lab1/pathbge1.in"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/lab1/pathbge1.out"));
+        BufferedReader in = new BufferedReader(new FileReader("src/Lab1/pathbge1.in"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab1/pathbge1.out"));
 
         String[] str;
         int a, b;
