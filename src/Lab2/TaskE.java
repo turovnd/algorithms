@@ -32,7 +32,7 @@ public class TaskE {
             open = new int[ver];
             close = new int[ver];
             isCycled = false;
-            adj = new ArrayList<>();
+            adj = new ArrayList();
             for (int i = 0; i < ver; i++) {
                 adj.add(new LinkedList());
             }
