@@ -1,4 +1,4 @@
-package lab1;
+package Lab1;
 
 import java.io.*;
 import java.util.Vector;
@@ -49,8 +49,8 @@ public class taskD {
      */
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/lab1/components.in"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/lab1/components.out"));
+        BufferedReader in = new BufferedReader(new FileReader("src/Lab1/components.in"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab1/components.out"));
 
         String[] str;
         int a, b;

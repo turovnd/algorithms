@@ -1,7 +1,6 @@
-package lab1;
+package Lab1;
 
 import java.io.*;
-import java.util.Scanner;
 
 /**
  * Created by Николай on 10.03.2017.
@@ -24,8 +23,8 @@ public class taskB {
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/lab1/input2.txt"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/lab1/output2.txt"));
+        BufferedReader in = new BufferedReader(new FileReader("src/Lab1/input2.txt"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab1/output2.txt"));
 
         int n = Integer.parseInt(in.readLine());
 

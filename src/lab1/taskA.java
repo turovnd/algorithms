@@ -1,4 +1,4 @@
-package lab1;
+package Lab1;
 
 import java.io.*;
 
@@ -9,8 +9,8 @@ public class taskA {
 
     public static void main(String [ ] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/lab1/input.txt"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/lab1/output.txt"));
+        BufferedReader in = new BufferedReader(new FileReader("src/Lab1/input.txt"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab1/output.txt"));
 
         StreamTokenizer tokenizer = new StreamTokenizer(in);
 
