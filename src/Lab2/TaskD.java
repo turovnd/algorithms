@@ -110,8 +110,8 @@ public class TaskD {
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("cond.in"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("cond.out"));
+        BufferedReader in = new BufferedReader(new FileReader("src/Lab2/cond.in"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab2/cond.out"));
 
         String[] str = in.readLine().split("[ ]");
         int n = Integer.parseInt(str[0]);
