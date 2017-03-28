@@ -2,7 +2,6 @@ package Lab2;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -14,30 +13,22 @@ public class TaskD {
 
     private static class Graph {
         Color[] color;
-        boolean[] visited;
-        int[] parent;
-        int[] open;
-        int[] close;
+
         int ver;
         int rib;
         ArrayList<LinkedList<Integer>> adj;
 
         LinkedList<Integer> order;
-        LinkedList<Integer> comp;
-        int[] components;
+        LinkedList<Integer> comps;
         int compNum;
 
         public Graph(int ver, int rib) {
             this.ver = ver;
             this.rib = rib;
-            visited = new boolean[ver];
+            this.compNum = 0;
             color = new Color[ver];
-            parent = new int[ver];
-            open = new int[ver];
-            close = new int[ver];
-            components = new int[ver];
             order = new LinkedList();
-            comp = new LinkedList();
+            comps = new LinkedList();
             adj = new ArrayList<>();
             for (int i = 0; i < ver; i++) {
                 adj.add(new LinkedList());
@@ -48,20 +39,17 @@ public class TaskD {
             adj.get(from).add(to);
         }
 
-        public void sortVer(){
-            Arrays.sort(close);
-        }
-
         public void __T () {
             ArrayList<LinkedList<Integer>> adj__T = new ArrayList(adj.size());
-            for (int i = 0; i<ver; i++)
+            for (int i = 0; i<ver; i++) {
                 adj__T.add(new LinkedList<>());
+            }
 
             for (int i = 0; i < adj.size(); i++) {
                 LinkedList<Integer> list = adj.get(i);
                 for (int j = 0; j<list.size(); j++) {
-                    int vertix = list.get(j);
-                    LinkedList<Integer> list__T = adj__T.get(vertix);
+                    int ver = list.get(j);
+                    LinkedList<Integer> list__T = adj__T.get(ver);
                     list__T.add(i);
                 }
             }
@@ -74,39 +62,56 @@ public class TaskD {
     private static void DFS (Graph graph) {
         for (int i = 0; i < graph.ver; i++) {
             graph.color[i] = Color.WHITE;
-            graph.parent[i] = -1;
         }
-        int time = 0;
         for (int i = 0; i < graph.ver; i++) {
             if (graph.color[i] == Color.WHITE) {
-                time = DFS_Visit(graph, i, time);
+                DFS_Visit(graph, i);
             }
         }
     }
 
 
-    private static int DFS_Visit(Graph graph, int i, int time) {
-
+    private static void DFS_Visit(Graph graph, int i) {
         graph.color[i] = Color.GREY;
-        time++;
-        graph.open[i] = time;
-
         for (Integer ver : graph.adj.get(i)) {
             if (graph.color[ver] == Color.WHITE) {
-                graph.parent[ver] = i;
-                time = DFS_Visit(graph, ver, time);
+                DFS_Visit(graph, ver);
             }
         }
         graph.color[i] = Color.BLACK;
-        graph.close[i] = time;
-        return time + 1;
+        graph.order.addFirst(i);
+    }
+
+
+    private static void DFS__T (Graph graph) {
+        for (int i = 0; i < graph.ver; i++) {
+            graph.color[i] = Color.WHITE;
+        }
+        for (int i = 0; i < graph.ver; i++) {
+            if (graph.color[graph.order.get(i)] == Color.WHITE) {
+                graph.compNum++;
+                DFS_Visit__T(graph, graph.order.get(i));
+            }
+        }
+
+    }
+
+    private static void DFS_Visit__T(Graph graph, int i) {
+        graph.color[i] = Color.GREY;
+        for (Integer ver : graph.adj.get(i)) {
+            if (graph.color[ver] == Color.WHITE) {
+                DFS_Visit__T(graph, ver);
+            }
+        }
+        graph.color[i] = Color.BLACK;
+        graph.comps.add(graph.compNum);
     }
 
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/Lab2/cond.in"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab2/cond.out"));
+        BufferedReader in = new BufferedReader(new FileReader("cond.in"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("cond.out"));
 
         String[] str = in.readLine().split("[ ]");
         int n = Integer.parseInt(str[0]);
@@ -123,13 +128,18 @@ public class TaskD {
         }
 
         DFS(graph);
-        graph.sortVer();
         graph.__T();
-        System.out.println(graph.order.toString());
+        DFS__T(graph);
+
+        out.write(graph.compNum + "\n");
+        for (int v = 0; v < graph.ver; v++) {
+            out.write(graph.comps.get(v) + " ");
+        }
+        //System.out.println(graph.order.toString());
+        //System.out.println(graph.comps.toString());
 
         in.close();
         out.close();
-
     }
 
 }
