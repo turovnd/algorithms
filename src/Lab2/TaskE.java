@@ -11,7 +11,6 @@ public class TaskE {
 
     public enum Color { WHITE, GREY, BLACK }
 
-
     private static class Graph {
         Color[] color;
         int[] parent;
@@ -95,6 +94,16 @@ public class TaskE {
     }
 
 
+    public static String checking(Graph graph, int[] list) {
+        for (int i = 0; i < list.length - 1; i++) {
+            if (!graph.adj.get(list[i]).contains(list[i+1])) {
+                return "NO";
+            }
+        }
+        return "YES";
+    }
+
+
     public static void main(String[] args) throws IOException {
 
         BufferedReader in = new BufferedReader(new FileReader("src/Lab2/hamiltonian.in"));
@@ -116,21 +125,11 @@ public class TaskE {
 
         int[] list = Topological_Sort(graph);
 
-        String outtxt = "";
         if (graph.isCycled) {
-            outtxt = "NO";
+            out.write("NO");
         } else {
-            for (int i = 0; i < list.length - 1; i++) {
-                if (!graph.adj.get(list[i]).contains(list[i+1])) {
-                    outtxt = "NO";
-                    break;
-                } else {
-                    outtxt = "YES";;
-                }
-            }
+            out.write(checking(graph,list));
         }
-
-        out.write(outtxt);
 
         in.close();
         out.close();
