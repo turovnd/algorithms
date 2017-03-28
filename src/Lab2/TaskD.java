@@ -13,9 +13,11 @@ public class TaskD {
 
     private static class Graph {
         Color[] color;
-
+        int[] open;
+        int[] close;
         int ver;
         int rib;
+        int time;
         ArrayList<LinkedList<Integer>> adj;
 
         LinkedList<Integer> order;
@@ -26,6 +28,9 @@ public class TaskD {
             this.ver = ver;
             this.rib = rib;
             this.compNum = 0;
+            this.time = 0;
+            open = new int[ver];
+            close = new int[ver];
             color = new Color[ver];
             order = new LinkedList();
             comps = new LinkedList();
@@ -72,6 +77,8 @@ public class TaskD {
 
 
     private static void DFS_Visit(Graph graph, int i) {
+        graph.time++;
+        graph.open[i] = graph.time;
         graph.color[i] = Color.GREY;
         for (Integer ver : graph.adj.get(i)) {
             if (graph.color[ver] == Color.WHITE) {
@@ -79,7 +86,8 @@ public class TaskD {
             }
         }
         graph.color[i] = Color.BLACK;
-        graph.order.addFirst(i);
+        graph.time++;
+        graph.close[i] = graph.time;
     }
 
 
@@ -135,8 +143,8 @@ public class TaskD {
         for (int v = 0; v < graph.ver; v++) {
             out.write(graph.comps.get(v) + " ");
         }
-        //System.out.println(graph.order.toString());
-        //System.out.println(graph.comps.toString());
+        System.out.println(graph.order.toString());
+        System.out.println(graph.comps.toString());
 
         in.close();
         out.close();

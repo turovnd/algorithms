@@ -11,11 +11,10 @@ public class TaskD1 {
 
     private static class Graph {
         boolean[] visited;
-        boolean[] visited2;
         int ver;
         int rib;
         ArrayList<LinkedList<Integer>> adj;
-        ArrayList<LinkedList<Integer>> adj2;
+        ArrayList<LinkedList<Integer>> adj__T;
 
         LinkedList<Integer> order;
         LinkedList<Integer> comps;
@@ -26,21 +25,25 @@ public class TaskD1 {
             this.rib = rib;
             this.compNum = 0;
             visited = new boolean[ver];
-            visited2 = new boolean[ver];
             order = new LinkedList();
             comps = new LinkedList();
-
             adj = new ArrayList<>();
-            adj2 = new ArrayList<>();
+            adj__T = new ArrayList<>();
             for (int i = 0; i < ver; i++) {
                 adj.add(new LinkedList());
-                adj2.add(new LinkedList());
+                adj__T.add(new LinkedList());
             }
         }
 
         public void addRib(int from, int to, int q) {
             if (q==1) adj.get(from).add(to);
-            else adj2.get(from).add(to);
+            if (q==2) adj__T.get(from).add(to);
+        }
+
+        public void clearVisited () {
+            for (int i = 0; i < ver; i++) {
+                this.visited[i] = false;
+            }
         }
 
     }
@@ -52,15 +55,15 @@ public class TaskD1 {
                 dfs(graph, x);
             }
         }
-        graph.order.addFirst(v);
+        graph.order.add(v);
     }
 
-    private static void dfs2 (Graph graph, int v, int compNum) {
-        graph.visited2[v] = true;
-        graph.comps.add(compNum);
-        for (int x : graph.adj2.get(v)) {
-            if (!graph.visited2[x]) {
-                dfs2(graph, x, compNum);
+    private static void dfs__T (Graph graph, int v) {
+        graph.visited[v] = true;
+        graph.comps.add(v);
+        for (int x : graph.adj__T.get(v)) {
+            if (!graph.visited[x]) {
+                dfs__T(graph, x);
             }
         }
     }
@@ -92,18 +95,25 @@ public class TaskD1 {
             }
         }
 
-        for (int v : graph.order) {
-            if (!graph.visited2[v]) {
+        graph.clearVisited();
+
+        graph.compNum++;
+        int[] result = new int[n];
+        for (int i = 0; i < n; i++) {
+            if (!graph.visited[graph.order.get(n - i - 1)]) {
+                dfs__T(graph, graph.order.get(n - i - 1));
+                for (int j = 0; j < graph.comps.size(); j++) {
+                    result[graph.comps.get(j)] = graph.compNum;
+                }
                 graph.compNum++;
-                dfs2(graph, v, graph.compNum);
+                graph.comps.clear();
             }
         }
-
+        graph.compNum-=1;
         out.write(graph.compNum + "\n");
-        for (int v = 0; v < graph.comps.size(); v++) {
-            out.write(graph.comps.get(v) + " ");
+        for (int v = 0; v < n; v++) {
+            out.write(result[v] + " ");
         }
-
 
         in.close();
         out.close();
