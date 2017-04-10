@@ -1,139 +1,118 @@
 package Lab3;
 
 import java.io.*;
+import javafx.util.Pair;
 import java.util.ArrayList;
-import java.util.LinkedList;
-
-import static java.lang.Math.random;
-import static java.lang.Math.sqrt;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 /**
  * Created by Николай on 10.04.2017
  */
 public class TaskC {
 
-    private static class Rib {
-        int begin;
-        int end;
-        int weight;
-
-        Rib (int b, int e, int w) {
-            this.begin = b;
-            this.end = e;
-            this.weight = w;
-        }
-    }
-
     private static class Graph {
-        int ver;
-        int rib;
-        Rib[] ribs;
-        int[] parent;
+        int vertex;
+        int edges;
+        ArrayList<ArrayList<Pair<Integer, Integer>>> adj;
 
-        Graph(int ver, int rib) {
-            this.ver = ver;
-            this.rib = rib;
-            rib++;
-            ver++;
-            this.ribs = new Rib[rib];
-            parent = new int[ver];
-            for (int i = 1; i < ver; i++) {
-                parent[i] = i;
+        Graph(int vertex, int edges) {
+            this.vertex = vertex;
+            this.edges = edges;
+            adj = new ArrayList<>(vertex);
+            for (int i = 0; i < vertex; i++) {
+                adj.add(new ArrayList<Pair<Integer, Integer>>());
             }
         }
-
-        void sort(int first, int last) {
-            int i = first, j = last;
-            Rib x = ribs[(first + last) >> 1];
-            while (i <= j) {
-                while (ribs[i].weight < x.weight) i++;
-                while (ribs[j].weight > x.weight) j--;
-
-                if(i <= j) {
-                    if (ribs[i].weight > ribs[j].weight) {
-                        Rib temp = ribs[i];
-                        ribs[i] = ribs[j];
-                        ribs[j] = temp;
-                    }
-                    i++;
-                    j--;
-                }
-
-            }
-
-            if (i < last)
-                sort(i, last);
-            if (first < j)
-                sort(first,j);
-        }
-
-        int find_set (int v) {
-            if (v == parent[v])
-                return v;
-
-            return find_set(parent[v]);
-        }
-
-        void union_set (int a, int b) {
-            a = find_set(a);
-            b = find_set(b);
-
-            if (random() % 1 == 0) {
-                int t = a;
-                a = b;
-                b = t;
-            }
-
-            if (a != b) {
-                parent[a] = b;
-            }
-        }
-
     }
+
+    private static int mstPrim(Graph graph) {
+        
+        int result = 0;
+        boolean[] used = new boolean[graph.vertex];
+        int[] key = new int[graph.vertex];
+        int[] parent = new int[graph.vertex];
+        
+        Comparator<Pair<Integer, Integer>> Pair_Comparator = new Comparator<Pair<Integer, Integer>>() {
+            @Override
+            public int compare(Pair<Integer, Integer> o1, Pair<Integer, Integer> o2) {
+                return o1.getValue().compareTo(o2.getValue());
+            }
+        };
+        
+        PriorityQueue<Pair<Integer, Integer>> queue = new PriorityQueue<Pair<Integer, Integer>>(Pair_Comparator);
+        
+        key[0] = 0;
+        parent[0] = -1;
+        queue.add(new Pair<>(0, 0));
+        
+        for (int i = 1; i < graph.vertex; i++) {
+            key[i] = Integer.MAX_VALUE;
+            parent[i] = -1;
+            queue.add(new Pair<>(i, key[i]));
+        }
+        
+        Pair<Integer, Integer> weight,ver;
+        
+        while (queue.size() != 0) {
+
+            weight = queue.poll();
+            if (weight.getValue() != key[weight.getKey()]) continue;
+            used[weight.getKey()] = true;
+
+            result += weight.getValue();
+
+            for (int i = 0; i < graph.adj.get(weight.getKey()).size(); i++) {
+                ver = graph.adj.get(weight.getKey()).get(i);
+                if ((!used[ver.getKey()]) && (ver.getValue() < key[ver.getKey()]))  {
+                    key[ver.getKey()] = ver.getValue();
+                    parent[ver.getKey()] = weight.getKey();
+                    queue.add(new Pair(ver.getKey(), key[ver.getKey()]));
+                }
+            }
+
+        }
+
+        return result;
+    }
+
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader in = new BufferedReader(new FileReader("src/Lab3/spantree2.in"));
         BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab3/spantree2.out"));
 
-        String[] str = in.readLine().split(" ");
+        String[] str = in.readLine().split("\\s");
 
         int n = Integer.parseInt(str[0]);
         int m = Integer.parseInt(str[1]);
 
         Graph graph = new Graph(n, m);
 
+        Pair<Integer, Integer> pair1, pair2;
         int b, e, w;
 
-        for (int i = 1; i <= m; i++) {
-            str = in.readLine().split(" ");
-            b = Integer.parseInt(str[0]);
-            e = Integer.parseInt(str[1]);
+        for (int i = 0; i < m; i++) {
+            str = in.readLine().split("\\s");
+            b = Integer.parseInt(str[0]) - 1;
+            e = Integer.parseInt(str[1]) - 1;
             w = Integer.parseInt(str[2]);
+            pair1 = new Pair<>(e, w);
+            pair2 = new Pair<>(b, w);
 
-            graph.ribs[i] = new Rib(b, e, w);
-        }
-
-        graph.sort(1, m);
-
-        int res = 0;
-        for (int i = 1; i < m; i++) {
-            b = graph.ribs[i].begin;
-            e = graph.ribs[i].end;
-            w = graph.ribs[i].weight;
-
-            if (graph.find_set(b) != graph.find_set(e)) {
-                res += w;
-                graph.union_set (b, e);
-            }
+            graph.adj.get(b).add(pair1);
+            graph.adj.get(e).add(pair2);
         }
 
 
-        System.out.println(Integer.toString(res));
-        out.write(Integer.toString(res));
+        int result = mstPrim(graph);
+
+        //System.out.println(Integer.toString(result));
+        out.write(Integer.toString(result));
 
         in.close();
         out.close();
 
     }
+
 }
