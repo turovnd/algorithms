@@ -1,8 +1,6 @@
 package Lab3;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 import static java.lang.Math.sqrt;
 

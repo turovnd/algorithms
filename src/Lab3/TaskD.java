@@ -1,95 +1,119 @@
 package Lab3;
 
 import java.io.*;
-
-import static java.lang.Math.random;
+import java.util.ArrayList;
 
 /**
- * Created by Николай on 10.04.2017
+ * Created by Николай on 11.04.2017
  */
 public class TaskD {
 
-    private static class Rib {
-        int begin;
-        int end;
-        int weight;
+    private static class Edge {
+        int from;
+        int to;
+        long weight;
 
-        Rib (int b, int e, int w) {
-            this.begin = b;
-            this.end = e;
-            this.weight = w;
+        Edge (int from, int to, long weight) {
+            this.from = from;
+            this.to = to;
+            this.weight = weight;
         }
     }
 
     private static class Graph {
-        int ver;
-        int rib;
-        Rib[] ribs;
-        int[] parent;
+        int vertex;
+        int edges;
+        ArrayList<Edge> adj;
 
-        Graph(int ver, int rib) {
-            this.ver = ver;
-            this.rib = rib;
-            this.ribs = new Rib[rib];
-            this.parent = new int[ver];
-            for (int i = 0; i < ver; i++) {
-                this.parent[i] = i;
-            }
+        Graph(int vertex, int edges) {
+            this.vertex = vertex;
+            this.edges = edges;
+            adj = new ArrayList<Edge>(vertex);
         }
+    }
 
-        void sort(int first, int last) {
-            int i = first, j = last;
-            Rib x = ribs[(first + last) >> 1];
-            while (i <= j) {
-                while (ribs[i].weight < x.weight) i++;
-                while (ribs[j].weight > x.weight) j--;
 
-                if(i <= j) {
-                    if (ribs[i].weight > ribs[j].weight) {
-                        Rib temp = ribs[i];
-                        ribs[i] = ribs[j];
-                        ribs[j] = temp;
-                    }
-                    i++;
-                    j--;
+    private static long find_MST (Graph graph) {
+
+        int root = 0;
+        long[] key = new long[graph.vertex];
+        int[] parent = new int[graph.vertex];
+        long[] label = new long[graph.vertex];
+        long[] сonnection_component = new long[graph.vertex];
+
+        long result = 0;
+
+        while (true) {
+
+            for (int i = 0; i < graph.vertex; i++) {
+                key[i] = Long.MAX_VALUE;
+                label[i] = -1;
+                сonnection_component[i] = -1;
+            }
+
+            for (Edge edge : graph.adj) {
+                if (edge.from == edge.to) continue;
+
+                if (edge.weight < key[edge.to]) {
+                    key[edge.to] = edge.weight;
+                    parent[edge.to] = edge.from;
                 }
-
             }
 
-            if (i < last)
-                sort(i, last);
-            if (first < j)
-                sort(first,j);
-        }
-
-        int find_set (int v) {
-            if (v == parent[v])
-                return v;
-
-            return find_set(parent[v]);
-        }
-
-        void union_set (int a, int b) {
-            a = find_set(a);
-            b = find_set(b);
-
-            if ((random() % 2) == 0) {
-                int t = a;
-                a = b;
-                b = t;
+            key[root] = 0;
+            for (int i = 0; i < graph.vertex; i++) {
+                if (key[i] == Long.MAX_VALUE) return -1;
+                result += key[i];
             }
 
-            if (a != b) {
-                parent[a] = b;
+            long K = 0;
+
+            for (int i = 0; i < graph.vertex; i++) {
+                int number = i;
+                while ((number != root) && (сonnection_component[number] == -1)) {
+                    сonnection_component[number] = i;
+                    number = parent[number];
+                }
+                if ((number != root) && (сonnection_component[number] == i)) {
+                    while (label[number] == -1) {
+                        label[number] = K;
+                        number = parent[number];
+                    }
+                    ++K;
+                }
             }
+
+            if (K == 0) break;
+
+            for (int i = 0; i < graph.vertex; i++) {
+                if (label[i] == -1) label[i] = K++;
+            }
+
+            for (int i = 0; i < graph.edges; i++) {
+                long xLabel = label[graph.adj.get(i).from];
+                long yLabel = label[graph.adj.get(i).to];
+
+                if (xLabel != yLabel)
+                    graph.adj.get(i).weight -= key[graph.adj.get(i).to];
+
+                graph.adj.get(i).from = (int) xLabel;
+                graph.adj.get(i).to = (int) yLabel;
+            }
+
+            root = (int)label[root];
+            graph.vertex = (int) K;
         }
+
+        return result;
 
     }
 
+
+
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/Lab3/spantree2.in"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab3/spantree2.out"));
+        BufferedReader in = new BufferedReader(new FileReader("chinese.in"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("chinese.out"));
 
         String[] str = in.readLine().split(" ");
 
@@ -98,37 +122,32 @@ public class TaskD {
 
         Graph graph = new Graph(n, m);
 
-        int b, e, w;
+        int from, to;
+        long weight;
 
         for (int i = 0; i < m; i++) {
             str = in.readLine().split(" ");
-            b = Integer.parseInt(str[0]) - 1;
-            e = Integer.parseInt(str[1]) - 1;
-            w = Integer.parseInt(str[2]);
+            from = Integer.parseInt(str[0]) - 1;
+            to = Integer.parseInt(str[1]) - 1;
+            weight = Long.parseLong(str[2]);
 
-            graph.ribs[i] = new Rib(b, e, w);
+            graph.adj.add(new Edge(from, to, weight));
         }
 
-        graph.sort(0, m);
+        long result = find_MST(graph);
 
-        int res = 0;
-        for (int i = 0; i < m; i++) {
-            b = graph.ribs[i].begin;
-            e = graph.ribs[i].end;
-            w = graph.ribs[i].weight;
-
-            if (graph.find_set(b) != graph.find_set(e)) {
-                res += w;
-                graph.union_set (b, e);
-            }
+        if (result != -1) {
+            out.write("YES\n");
+            out.write(Long.toString(result));
+        } else {
+            out.write("NO");
         }
 
-
-        System.out.println(Integer.toString(res));
-        out.write(Integer.toString(res));
 
         in.close();
         out.close();
 
     }
+
+
 }
