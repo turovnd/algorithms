@@ -9,61 +9,69 @@ import java.util.Arrays;
  */
 public class TaskE {
 
-    private static class Edge {
-        int start;
-        int end;
-        int weight;
-
-        Edge(int s, int e, int w) {
-            this.start  = s;
-            this.end    = e;
-            this.weight = w;
-        }
-    }
-
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/Lab4/path.in"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab4/path.out"));
+        BufferedReader in = new BufferedReader(new FileReader("src/Lab4/negcycle.in"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab4/negcycle.out"));
 
         StreamTokenizer tokenizer = new StreamTokenizer(in);
         tokenizer.nextToken();
         int n = (int) tokenizer.nval;
-        tokenizer.nextToken();
-        int m = (int) tokenizer.nval;
-        tokenizer.nextToken();
-        int start = (int) tokenizer.nval;
 
-        ArrayList<Edge> edges = new ArrayList<>();
+        int[][] matrix = new int[n][n];
 
-        int s, e, w;
-        for (int i = 0; i < m; i++) {
-            tokenizer.nextToken();
-            s = (int) tokenizer.nval - 1;
-            tokenizer.nextToken();
-            e = (int) tokenizer.nval - 1;
-            tokenizer.nextToken();
-            w = (int) tokenizer.nval;
-
-            edges.add(new Edge(s, e, w));
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                tokenizer.nextToken();
+                matrix[i][j] = (int) tokenizer.nval;
+            }
         }
 
-        int [] d = new int[n];
-        Arrays.fill(d, Integer.MAX_VALUE);
-        d[start] = 0;
+        int [] dist = new int[n];
+        int [] parent = new int[n];
+        Arrays.fill(dist, 1000000000);
+        Arrays.fill(parent, -1);
 
-        for (Edge edge : edges) {
-            if (edge.start == start) {
-                d[edge.end] = edge.weight;
-            } else if (d[edge.end] > d[edge.start] + edge.weight) {
-                d[edge.end] = d[edge.start] + edge.weight;
+        dist[0] = 0;
+        int start = -1;
+
+        for (int k = 0; k < n; k++) {
+            start = -1;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (dist[j] > dist[i] + matrix[i][j]) {
+                        parent[j] = i;
+                        dist[j] = dist[i] + matrix[i][j];
+                        start = j;
+                    }
+                }
             }
         }
 
 
-        for(int i = 0; i < n; i++) {
-            out.write(Integer.toString(d[i]) + " ");
+        if (start == -1) {
+            out.write("NO");
+        } else {
+            int finish = start;
+
+            for (int i = 0; i < n; i++) {
+                finish = parent[finish];
+            }
+
+            ArrayList<Integer> path = new ArrayList<>();
+
+            for (int j = finish; ; j = parent[j]) {
+                path.add(j);
+                if (j == finish && path.size() > 1) break;
+            }
+
+            out.write("YES\n");
+            out.write(path.size() + "\n");
+            for (int i = path.size() - 1; i >= 0; i--) {
+                out.write((path.get(i) + 1) + " ");
+            }
         }
+
 
         in.close();
         out.close();
