@@ -3,60 +3,17 @@ package Lab4;
 import javafx.util.Pair;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Created by Николай on 10.04.2017
  */
 public class TaskC1 {
 
-//    private static class Edge {
-//        int from;
-//        int to;
-//        long weight;
-//
-//        Edge (int from, int to, long weight) {
-//            this.from = from;
-//            this.to = to;
-//            this.weight = weight;
-//        }
-//    }
-
-    private static class Graph {
-        int vertex;
-        int edges;
-        ArrayList<LinkedList<pair>> adj;
-
-        Graph(int vertex, int edges) {
-            this.vertex = vertex;
-            this.edges = edges;
-            adj = new ArrayList<>();
-            for (int i = 0; i < vertex; i++) {
-                adj.add(new LinkedList<pair>());
-            }
-            //adj = new ArrayList<Edge>(vertex);
-        }
-
-        void addPair(int from, pair p) {
-            adj.get(from).add(p);
-        }
-    }
-
-    private static class pair {
-        int to;
-        int weight;
-        pair (int t, int w) {
-            this.to = t;
-            this.weight = w;
-        }
-    }
-
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/Lab4/pathbgep.in"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab4/pathbgep.out"));
+        BufferedReader in = new BufferedReader(new FileReader("pathbgep.in"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("pathbgep.out"));
 
         StreamTokenizer tokenizer = new StreamTokenizer(in);
         tokenizer.nextToken();
@@ -64,27 +21,76 @@ public class TaskC1 {
         tokenizer.nextToken();
         int m = (int) tokenizer.nval;
 
-        Graph graph = new Graph(n, m);
+        int start = 0;
 
-        int s,e,w;
+        ArrayList<Integer>[] adj = new ArrayList[n];
+        for (int i = 0; i < n; ++i) {
+            adj[i] = new ArrayList<Integer>();
+        }
+
+        ArrayList<Long>[] weight = new ArrayList[n];
+        for (int i = 0; i < n; ++i) {
+            weight[i] = new ArrayList<Long>();
+        }
+
+        int from, to;
+        long w;
+
         for (int i = 0; i < m; i++) {
             tokenizer.nextToken();
-            s = (int) tokenizer.nval - 1;
+            from = (int) tokenizer.nval - 1;
             tokenizer.nextToken();
-            e = (int) tokenizer.nval - 1;
+            to = (int) tokenizer.nval - 1;
             tokenizer.nextToken();
             w = (int) tokenizer.nval;
 
-            graph.addPair(s, new pair(e,w));
-            graph.addPair(e, new pair(s,w));
+            adj[from].add(to);
+            weight[from].add(w);
+        }
+
+        long[] dist = new long[n];
+        Arrays.fill(dist, Long.MAX_VALUE);
+
+        int[] prev = new int[n];
+        Arrays.fill(prev, -1);
+
+        boolean used[] = new boolean[n];
+
+        dist[start] = 0;
+
+        for (int iter = 0; iter < n; iter++) {
+            int v = -1;
+            long distV = Long.MAX_VALUE;
+
+            for (int i = 0; i < n; i++) {
+                if (used[i]) {
+                    continue;
+                }
+                if (distV < dist[i]) {
+                    continue;
+                }
+                v = i;
+                distV = dist[i];
+            }
+
+            for (int i = 0; i < adj[v].size(); i++) {
+                int u = adj[v].get(i);
+                long weightU = weight[v].get(i);
+
+                if (dist[v] + weightU < dist[u]) {
+                    dist[u] = dist[v] + weightU;
+                    prev[u] = v;
+                }
+            }
+
+            used[v] = true;
         }
 
 
-        for(int i = 0; i < n; i++) {
-            graph.adj.get(i);
-
-            //out.write(Integer.toString(d[i]) + " ");
+        for (int i = 0; i < n; i++) {
+            out.write(Long.toString(dist[i]) + " ");
         }
+
 
         in.close();
         out.close();

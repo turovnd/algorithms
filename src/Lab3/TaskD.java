@@ -112,8 +112,8 @@ public class TaskD {
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("chinese.in"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("chinese.out"));
+        BufferedReader in = new BufferedReader(new FileReader("src/Lab3/chinese.in"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab3/chinese.out"));
 
         String[] str = in.readLine().split(" ");
 

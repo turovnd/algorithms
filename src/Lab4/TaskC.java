@@ -23,8 +23,8 @@ public class TaskC {
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new FileReader("src/Lab4/pathbgep.in"));
-        BufferedWriter out = new BufferedWriter(new FileWriter("src/Lab4/pathbgep.out"));
+        BufferedReader in = new BufferedReader(new FileReader("pathbgep.in"));
+        BufferedWriter out = new BufferedWriter(new FileWriter("pathbgep.out"));
 
         StreamTokenizer tokenizer = new StreamTokenizer(in);
         tokenizer.nextToken();
@@ -43,12 +43,15 @@ public class TaskC {
             tokenizer.nextToken();
             w = (int) tokenizer.nval;
 
+
             edges.add(new Edge(s, e, w));
             edges.add(new Edge(e, s, w));
+
         }
 
         int [] d = new int[n];
         Arrays.fill(d, Integer.MAX_VALUE);
+
         d[0] = 0;
         boolean flag = true;
         while (flag) {
