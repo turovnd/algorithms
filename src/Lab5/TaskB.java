@@ -70,12 +70,12 @@ public class TaskB {
         }
 
         out.print(mtSize);
-//        System.out.println(mtSize);
-//        for (int i = 0; i < n2; ++i) {
-//            if (mt[i] != -1) {
-//                System.out.println((mt[i] + 1) + " " + (i + 1));
-//            }
-//        }
+        System.out.println(mtSize);
+        for (int i = 0; i < n2; ++i) {
+            if (mt[i] != -1) {
+                System.out.println((mt[i] + 1) + " " + (i + 1));
+            }
+        }
 
         in.close();
         out.close();
